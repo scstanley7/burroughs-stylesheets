@@ -89,12 +89,9 @@
         </xsl:choose>
     </xsl:template>
     
-    <!-- this is an unacceptably hacky solution, but it works for the time being -->
-    <!-- while we use this, we need to test documents for <gap> elements where @extent > 50 (this is unlikely) -->
     <xsl:template match="tei:gap">
         <xsl:variable name="missing-chars" select="@extent"/>
-        <xsl:variable name="exes" select="substring('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',1,$missing-chars)"/>
-        <span class="gap"><xsl:value-of select="$exes"/></span>
+        <span class="gap"><xsl:for-each select="1 to $missing-chars"><xsl:text>x</xsl:text></xsl:for-each></span>
     </xsl:template>
     
     <xsl:template match="tei:add">

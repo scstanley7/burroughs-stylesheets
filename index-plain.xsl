@@ -17,13 +17,10 @@
         </xsl:result-document>
     </xsl:template>
     
-    
-    
-    
     <xsl:template match="tei:zone[not(child::tei:s)]"/>
     
     <xsl:template match="tei:zone/text()">
-        <xsl:text>
+<xsl:text>
 </xsl:text>
     </xsl:template>
     
@@ -42,7 +39,7 @@
                 </xsl:for-each>
             </xsl:when>
             <xsl:when test="not(@n)"/>
-            <xsl:otherwise/>
+            <xsl:otherwise><xsl:analyze-string select="." regex="\n"><xsl:matching-substring><xsl:text></xsl:text></xsl:matching-substring></xsl:analyze-string></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
     
@@ -72,5 +69,10 @@
     
     <xsl:template match="tei:note"/>
     
-    
+    <xsl:template match="tei:gap">
+        <!-- create a variable whose value is the value of @extent (this should always be an integer) -->
+        <xsl:variable name="missingChars" select="@extent"/>
+        <!-- for the length of $missingChars (@extent) put an "x" character (e.g. if the `extent="3"` print "xxx"; if `extent="5"` print "xxxxx" -->
+        <span class="gap"><xsl:for-each select="1 to $missingChars"><xsl:text>x</xsl:text></xsl:for-each></span>
+    </xsl:template>
 </xsl:stylesheet>

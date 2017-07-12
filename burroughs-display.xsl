@@ -13,26 +13,27 @@
     
     <!-- create a new document for each surface that contains an HTML <div> element -->
     <!-- @exclude-result-prefixes will ensure that you don't end up with a tei namespace declared on every element -->
-    <xsl:template match="tei:surface" exclude-result-prefixes="#all">
+    <xsl:template match="tei:surface">
         <xsl:variable name="fileName" select="@facs"/>
         <xsl:variable name="pn" select="@n"/>
         <xsl:variable name="side" select="@rend"/>
-        <div>
-            <xsl:attribute name="id">
-                <xsl:value-of select="@facs"/>
-            </xsl:attribute>
-            <xsl:choose>
-                <xsl:when test="@ana">
-                    <xsl:attribute name="class">handwritten</xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:attribute name="class">typewritten</xsl:attribute>
-                </xsl:otherwise>
-            </xsl:choose>
-            <!-- add an HTML <p> at the top of each page-level <div> that states the page number and whether it's recto or verso -->
-            <p class="page-number"><xsl:value-of select="$pn"/><xsl:text> </xsl:text><xsl:value-of select="$side"></xsl:value-of></p>
-            <xsl:apply-templates/>
-        </div>
+        <xsl:result-document exclude-result-prefixes="#all" indent="yes" method="xml" omit-xml-declaration="yes" byte-order-mark="no" href="{$fileName}.display.html">
+            <div>
+                <xsl:attribute name="id">
+                    <xsl:value-of select="@facs"/>
+                </xsl:attribute>
+                <xsl:choose>
+                    <xsl:when test="@ana">
+                        <xsl:attribute name="class">handwritten</xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:attribute name="class">typewritten</xsl:attribute>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <p class="page-number"><xsl:value-of select="$pn"/><xsl:text> </xsl:text><xsl:value-of select="$side"></xsl:value-of></p>
+                <xsl:apply-templates/>
+            </div>
+        </xsl:result-document>
     </xsl:template>
     
     <!-- match every TEI <zone> element with an HTML <p> -->
@@ -119,7 +120,7 @@
         <!-- for the length of $missingChars (@extent) put an "x" character (e.g. if the `extent="3"` print "xxx"; if `extent="5"` print "xxxxx" -->
         <span class="gap"><xsl:for-each select="1 to $missingChars"><xsl:text>x</xsl:text></xsl:for-each></span>
     </xsl:template>
-    
+ 
     <!-- match the TEI <subst> element, put it in an HTML <span> tag, match all attributes (specified below), process all nodes, and display all text -->
     <xsl:template match="tei:subst">
         <span><xsl:apply-templates select="@* | node() | text()"></xsl:apply-templates></span>
@@ -167,9 +168,9 @@
     <!-- match all TEI <metamark> elements -->
     <xsl:template match="tei:metamark">
         <xsl:choose>
-            <!-- if it has a value of "insert" on @function, display a carrot within the HTML <i> element with a @class of "insert" -->
+<!--             if it has a value of "insert" on @function, display a carrot within the HTML <i> element with a @class of "insert" -->
             <xsl:when test="@function='insert'"><i class="insert">^</i></xsl:when>
-            <!-- TBD, although I suspect this will involve inline CSS, unfortunately -->
+            <!-- TBD, although I suspect this will involve inline CSS, unfortunately --> 
             <xsl:when test="@rend='upconnect'"><!-- see tsosu for examples --></xsl:when>
             <xsl:when test="@rend='updownconnect'"><!-- see tsosu for examples --></xsl:when>
             <xsl:otherwise><xsl:apply-templates/></xsl:otherwise>

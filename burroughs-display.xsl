@@ -134,11 +134,11 @@
                 <!-- if its direct parent is TEI <subst> put it in an <a> tag -->
                 <!-- this part is not done yet; have to figure out how to display the corresponding <del> tag (hover? on click?) -->
                 <xsl:when test="parent::tei:subst">
-                    <a><xsl:apply-templates/></a>
+                    <a class="add"><xsl:apply-templates/></a>
                 </xsl:when>
                 <!-- if its parent is anything other than TEI <subst>, stick it in an HTML <i> tag -->
                 <xsl:otherwise>
-                    <i><xsl:apply-templates/></i>
+                    <i class="add"><xsl:apply-templates/></i>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:if>
@@ -169,13 +169,16 @@
     <xsl:template match="tei:metamark">
         <xsl:choose>
 <!--             if it has a value of "insert" on @function, display a carrot within the HTML <i> element with a @class of "insert" -->
-            <xsl:when test="@function='insert'"><i class="insert">^</i></xsl:when>
+            <xsl:when test="@function='insert'"><i class="add">^</i></xsl:when>
             <!-- TBD, although I suspect this will involve inline CSS, unfortunately --> 
-            <xsl:when test="@rend='upconnect'"><!-- see tsosu for examples --></xsl:when>
-            <xsl:when test="@rend='updownconnect'"><!-- see tsosu for examples --></xsl:when>
+            <xsl:when test="@rend='upconnect'"><span class="upconnect"><xsl:apply-templates/></span></xsl:when>
+            <xsl:when test="@rend='updownconnect'"><span class="updownconnect"><xsl:apply-templates/></span></xsl:when>
+            <xsl:when test="@rend='downconnect'"><span class="downconnect"><xsl:apply-templates/></span></xsl:when>
             <xsl:otherwise><xsl:apply-templates/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+    
+    <xsl:template match="tei:seg"><xsl:apply-templates/></xsl:template>
     
     <!-- ******************************************************* -->
     <!-- ******************************************************* -->

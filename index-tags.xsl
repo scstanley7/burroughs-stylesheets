@@ -112,22 +112,23 @@
     
     <xsl:template match="tei:gap[not(parent::tei:s)]"></xsl:template>
     
+    <!-- match the TEI <del> element -->
     <xsl:template match="tei:del">
         <xsl:choose>
             <!-- if <del> has the @rend attribute, put it in a span tag, display any text/process any nodes contained within -->
             <!-- also, match any attributes **see section below for more information on how attributes match** -->
             <xsl:when test="@rend">
-                <span><xsl:apply-templates select="@* | node() | text()"></xsl:apply-templates></span>
+                <span style="color:black;"><xsl:apply-templates select="@rend | node() | text()"></xsl:apply-templates></span>
             </xsl:when>
             <!-- if it has a @type attribute just process the children -->
             <!-- NOTE: these documents do not have any <del> with both @rend and @status -->
             <!-- this particular <xsl:choose> would not work if there were <del> elements with both of these attributes -->
             <xsl:when test="@status">
-                <xsl:apply-templates/>
+                <span style="color:black;"><xsl:apply-templates/></span>
             </xsl:when>
             <!-- if the TEI <del> element has neither a @status nor a @rend attribute, put it in an HTML <del> tag -->
             <xsl:otherwise>
-                <del><xsl:apply-templates/></del>
+                <del style="color:black;"><xsl:apply-templates/></del>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

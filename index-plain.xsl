@@ -12,7 +12,7 @@
     
     <xsl:template match="tei:surface">
         <xsl:variable name="fileName-generated" select="@facs"/>
-        <xsl:result-document exclude-result-prefixes="#all" indent="yes" method="text" byte-order-mark="no" href="{$fileName-generated}.index.txt">
+        <xsl:result-document exclude-result-prefixes="#all" indent="no" method="text" byte-order-mark="no" href="{$fileName-generated}.index.txt">
             <xsl:apply-templates/>
         </xsl:result-document>
     </xsl:template>
@@ -44,13 +44,10 @@
     </xsl:template>
     
     <xsl:template match="tei:s/text()">
-        <xsl:if test="preceding-sibling::node()">
-            <xsl:text> </xsl:text>
-        </xsl:if>
-        <xsl:value-of select="normalize-space()"/>
-        <xsl:if test="following-sibling::node()">
-            <xsl:text> </xsl:text>
-        </xsl:if>
+        <xsl:analyze-string select="." regex="\n\s+">
+            <xsl:matching-substring><xsl:text> </xsl:text></xsl:matching-substring>
+            <xsl:non-matching-substring><xsl:value-of select="."/></xsl:non-matching-substring>
+        </xsl:analyze-string>
     </xsl:template>
     
     <xsl:template match="tei:del"/>

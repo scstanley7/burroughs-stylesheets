@@ -37,23 +37,12 @@
         <p><xsl:apply-templates/></p>
     </xsl:template>
     
-    <!-- insert an asterisk wherever there's a TEI <anchor/> element -->
-    <!-- surround each asterisk with an HTML <a> tag whose @href is the value of @corresp on <anchor/> -->
-    <xsl:template match="tei:anchor">
-        <xsl:variable name="note-ptr" select="@corresp"/>
-        <a>
-            <xsl:attribute name="href"><xsl:value-of select="$note-ptr"/></xsl:attribute>
-            <xsl:text>*</xsl:text>
-        </a>
-    </xsl:template>
-    
     <!-- put each TEI <note> element into an HTML <span> and assign it an ID of whatever @xml:id on <note> is -->
     <!-- DISPLAY NOTE: Notes should be displayed with an asterisk an on-click or with hover  -->
     <xsl:template match="tei:note">
         <xsl:variable name="note-id" select="@xml:id"/>
-        <span class="note">
-            <xsl:attribute name="id"><xsl:value-of select="$note-id"/></xsl:attribute>
-            <xsl:apply-templates/>
+        <span class="anchor">
+            <xsl:text>*</xsl:text><span class="note"><xsl:apply-templates/></span>
         </span>
     </xsl:template>
     
@@ -130,6 +119,7 @@
     
     <!-- match the TEI <add> element -->
     <xsl:template match="tei:add">
+        <xsl:variable name="rotate" select="@rendition"/>
         <xsl:if test="@place='inline'">
             <!-- find all the TEI <add> elements with @place="inline" -->
             <sup><xsl:apply-templates select="@* | node() | text()"/></sup>
@@ -150,7 +140,17 @@
             <span><xsl:apply-templates select="@* | node() | text()"/></span>
         </xsl:if>
         <xsl:if test="@place='marginleft'">
-            <span><xsl:apply-templates select="@* | node() | text()"/></span>
+            <xsl:choose>
+                <xsl:when test="@rendition">
+                    <span><xsl:attribute name="class"><xsl:value-of select="$rotate"/> marginleft</xsl:attribute>
+                        <xsl:attribute name="style"></xsl:attribute>
+                        <xsl:apply-templates select="@hand | node() | text()"/>
+                    </span>
+                </xsl:when>
+                <xsl:otherwise>
+                    <span><xsl:apply-templates select="@* | node() | text()"/></span>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:if>
         <xsl:if test="@place='marginright'">
             <span><xsl:apply-templates select="@* | node() | text()"/></span>
@@ -240,5 +240,7 @@
     <!-- @status and @instant should not match onto anything -->
     <xsl:template match="@status"/>
     <xsl:template match="@instant"/>
+    
+    <xsl:template match="@rendition"/>
     
 </xsl:stylesheet>

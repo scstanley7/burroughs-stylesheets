@@ -105,8 +105,14 @@
         <xsl:choose>
             <!-- if <del> has the @rend attribute, put it in a span tag, display any text/process any nodes contained within -->
             <!-- also, match any attributes **see section below for more information on how attributes match** -->
-            <xsl:when test="@rend">
-                <span style="color:black;"><xsl:apply-templates select="@rend | node() | text()"></xsl:apply-templates></span>
+            <xsl:when test="@rend ='overtyped'">
+                <del style="color:black;"><xsl:apply-templates/></del>
+            </xsl:when>
+            <xsl:when test="@rend ='overwritten'">
+                <del style="color:black;"><xsl:apply-templates/></del>
+            </xsl:when>
+            <xsl:when test="@rend='erased'">
+                <span class="erased"><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text></span>
             </xsl:when>
             <!-- if it has a @type attribute just process the children -->
             <!-- NOTE: these documents do not have any <del> with both @rend and @status -->
@@ -138,38 +144,28 @@
     <xsl:template match="tei:add">
         <xsl:if test="@place='inline'">
             <!-- find all the TEI <add> elements with @place="inline" -->
-            <xsl:choose>
-                <!-- if its direct parent is TEI <subst> put it in an <a> tag -->
-                <!-- this part is not done yet; have to figure out how to display the corresponding <del> tag (hover? on click?) -->
-                <xsl:when test="parent::tei:subst">
-                    <a class="add"><xsl:apply-templates/></a>
-                </xsl:when>
-                <!-- if its parent is anything other than TEI <subst>, stick it in an HTML <i> tag -->
-                <xsl:otherwise>
-                    <i class="add"><xsl:apply-templates/></i>
-                </xsl:otherwise>
-            </xsl:choose>
+            <sup><xsl:apply-templates select="@* | node() | text()"/></sup>
         </xsl:if>
         <!-- if @place on <add> is "supralinear", stick it in an HTML <sup> tag -->
         <xsl:if test="@place='supralinear'">
-            <sup><xsl:apply-templates/></sup>
+            <sup><xsl:apply-templates select="@* | node() | text()"/></sup>
         </xsl:if>
         <!-- if @place on <add> is "infralinear", stick it in an HTML <sub> tag -->
         <xsl:if test="@place='infralinear'">
-            <sub><xsl:apply-templates/></sub>
+            <sub><xsl:apply-templates select="@* | node() | text()"/></sub>
         </xsl:if>
         <!-- if @place is margintop, -bottom, -left, or -right, stick it in an HTML <span> tag with a @class whose value is whatever the value of @place is -->
         <xsl:if test="@place='margintop'">
-            <span class="margintop"><xsl:apply-templates/></span>
+            <span><xsl:apply-templates select="@* | node() | text()"/></span>
         </xsl:if>
         <xsl:if test="@place='marginbottom'">
-            <span class="marginbottom"><xsl:apply-templates/></span>
+            <span><xsl:apply-templates select="@* | node() | text()"/></span>
         </xsl:if>
         <xsl:if test="@place='marginleft'">
-            <span class="marginleft"><xsl:apply-templates/></span>
+            <span><xsl:apply-templates select="@* | node() | text()"/></span>
         </xsl:if>
         <xsl:if test="@place='marginright'">
-            <span class="marginright"><xsl:apply-templates/></span>
+            <span><xsl:apply-templates select="@* | node() | text()"/></span>
         </xsl:if>
     </xsl:template>
     
@@ -230,18 +226,27 @@
         </xsl:choose>
     </xsl:template>
     
-    <!-- match all instances of @rend -->
-    <!-- values of "overwritten" and "overtyped" should be given a @class of "del-hover"; "erased" should be given a class of "erased" -->
-    <xsl:template match="@rend">
-        <xsl:if test=".='overwritten'">
-            <xsl:attribute name="class">del-hover</xsl:attribute>
-        </xsl:if>
-        <xsl:if test=".='overtyped'">
-            <xsl:attribute name="class">del-hover</xsl:attribute>
-        </xsl:if>
-        <xsl:if test=".='erased'">
-            <xsl:attribute name="class">erased</xsl:attribute>
-        </xsl:if>
+    <xsl:template match="@place">
+        <xsl:choose>
+            <xsl:when test=".='marginleft'">
+                <xsl:attribute name="class">marginleft</xsl:attribute>
+            </xsl:when>
+            <xsl:when test=".='marginleft'">
+                <xsl:attribute name="class">marginleft</xsl:attribute>
+            </xsl:when>
+            <xsl:when test=".='marginright'">
+                <xsl:attribute name="class">marginright</xsl:attribute>
+            </xsl:when>
+            <xsl:when test=".='margintop'">
+                <xsl:attribute name="class">margintop</xsl:attribute>
+            </xsl:when>
+            <xsl:when test=".='marginbottom'">
+                <xsl:attribute name="class">marginbottom</xsl:attribute>
+            </xsl:when>
+            <xsl:when test=".='infralinear'"/>
+            <xsl:when test=".='supralinear'"/>
+            <xsl:when test=".='inline'"/>
+        </xsl:choose>
     </xsl:template>
     
     <!-- @status and @instant should not match onto anything -->

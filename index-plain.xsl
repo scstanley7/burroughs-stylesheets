@@ -52,9 +52,11 @@
     
     <xsl:template match="tei:del"/>
     
-    <xsl:template match="tei:add">
+    <xsl:template match="tei:add[parent::tei:s]">
         <xsl:apply-templates/>
     </xsl:template>
+    
+    <xsl:template match="tei:add[not(parent::tei:s)]"/>
     
     <xsl:template match="tei:add/text()">
         <xsl:value-of select="normalize-space()"></xsl:value-of>
@@ -70,6 +72,6 @@
         <!-- create a variable whose value is the value of @extent (this should always be an integer) -->
         <xsl:variable name="missingChars" select="@extent"/>
         <!-- for the length of $missingChars (@extent) put an "x" character (e.g. if the `extent="3"` print "xxx"; if `extent="5"` print "xxxxx" -->
-        <span class="gap"><xsl:for-each select="1 to $missingChars"><xsl:text>x</xsl:text></xsl:for-each></span>
+        <xsl:text>(</xsl:text><xsl:for-each select="1 to $missingChars"><xsl:text>x</xsl:text></xsl:for-each><xsl:text>)</xsl:text>
     </xsl:template>
 </xsl:stylesheet>

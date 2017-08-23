@@ -1,0 +1,149 @@
+html {
+    width:100%;
+}
+
+div.typewritten {
+    font-family: "Courier New", monospace;
+    font-size:75%;
+    width:80%;
+    margin-left:20%
+}
+
+div.handwritten {
+    font-family:cursive;
+    font-size:80%;
+    width:80%;
+    margin-left:20%
+}
+
+.page-number {
+    font-style:italic;
+    color:grey;
+}
+
+.pageNum {
+    display:block;
+}
+
+.marginright {
+    width:150px;
+}
+
+.marginleft {
+    position:absolute;
+	margin-right:70%;
+	vertical-align:bottom;
+	left:5px;
+	display:inline-block;
+}
+
+.margintop {
+    
+}
+
+.marginbottom {
+    
+}
+
+.rotate270 {
+    -ms-transform: rotate(270deg); /* IE 9 */
+    -webkit-transform: rotate(270deg); /* Chrome, Safari, Opera */
+    transform: rotate(270deg);
+}
+
+span.anchor span.note {
+    display:none;
+}
+
+span.anchor:hover span.note {
+    display:block;
+    position:absolute;
+    color:black;
+    background-color:#CEB888;
+    border-style:solid;
+    border-color:black;
+    font-family:arial, helvetica, sans-serif;
+}
+
+span.gap {
+    font-style:italic;
+    color:grey;
+}
+
+.add {
+    font-style:italic;
+}
+
+.erased {
+    font-style:italic;
+    color:grey;
+}
+
+.upconnect {
+    border-top-left-radius:50px;
+    border-top: 1px solid ;
+    padding: 2px 2px 2px 2px;
+    border-top-right-radius:50px;
+    &#xA;  
+}
+
+.updownconnect {
+    border-bottom: 1px solid ;
+    border-top: 1px solid ;
+    border-bottom-left-radius:50px;
+    padding: 2px 2px 2px 2px;
+    border-bottom-right-radius:50px;
+    border-top-right-radius:50px;
+    border-top-left-radius:50px;
+    &#xA;  
+}
+
+span.transpose:first-child {
+    border-top: 1px solid ;
+    border-left: 1px solid;
+    border-right: 1px solid;
+}
+
+span.transpose:last-child {
+    border-bottom: 1px solid ;
+    border-left: 1px solid;
+    border-right: 1px solid;
+}
+
+/* This is a really cruddy way of indicating deletion spans. Favenzio/Bryan, if you can think of a better way, let me know!! */
+/* Basically, it would work a lot better if I could say, "anything between these two anchors is scribbled out," but I'm not sure
+I know how to do that with css. This way of doing it also doesn't work if the del span crosses to <tei:zone> elements, or if there's
+a sibling html <span> that isn't included in the deletion. */
+
+#delspants1_1 ~ span {
+    background-color:gray;
+}
+
+#delspants1_2 ~ span {
+    background-color:gray;
+}
+
+#delspants1_3 ~ span {
+    background-color:gray;
+}
+
+#delspants1_4 ~ span {
+    background-color:gray;
+}
+
+#delspants1_5 ~ span {
+    background-color:gray;
+}
+
+#delspants1_6 ~ span {
+    background-color:gray;
+}
+
+#delspants1_7 ~ span {
+    background-color:gray;
+}
+
+
+#delspants1_8 ~ span {
+    background-color:gray;
+}

@@ -19,12 +19,18 @@
         </xsl:result-document>
     </xsl:template>
     
-    <xsl:template match="tei:fw"/>
-    
     <xsl:template match="tei:zone/text()">
         <xsl:text>
 </xsl:text>
     </xsl:template>
+    
+    <xsl:template match="tei:note"/>
+    
+    <xsl:template match="tei:lb[not(@break)]">
+        <xsl:text> </xsl:text>
+    </xsl:template>
+    
+    <xsl:template match="tei:fw"/>
     
     <xsl:template match="tei:s">
         <xsl:variable name="sentenceNum">
@@ -58,60 +64,10 @@
         <xsl:value-of select="normalize-space()"/>
     </xsl:template>
     
-    <xsl:template match="tei:hi[ancestor-or-self::tei:s]">
-        <xsl:choose>
-            <xsl:when test="@rend='circled'">
-                <span class="circled"><xsl:value-of select="normalize-space()"/></span>
-            </xsl:when>
-            <xsl:when test="@rend='underline'">
-                <u><xsl:value-of select="normalize-space()"/></u>
-            </xsl:when>
-            <xsl:when test="@rend='boxedblock'">
-                <span class="boxedblock"><xsl:value-of select="normalize-space()"/></span>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:apply-templates/>
-            </xsl:otherwise>
-        </xsl:choose>
+    <xsl:template match="tei:subst">
+        <span><xsl:apply-templates select="@* | node() | text()"></xsl:apply-templates></span>
     </xsl:template>
     
-    <xsl:template match="tei:hi[not(ancestor-or-self::tei:s)]"/>
-    
-    <!--<xsl:template match="tei:subst">
-        <xsl:apply-templates/>
-    </xsl:template>-->
-    
-    <!--<xsl:template match="tei:subst/text()">
-        <xsl:value-of select="normalize-space()"></xsl:value-of>
-    </xsl:template>-->
-    
-    <xsl:template match="tei:add[parent::tei:zone]"/>
-    <!--
-    <xsl:template match="tei:add[parent::tei:s] | tei:add[parent::tei:subst]">
-        <sup><xsl:apply-templates/></sup>
-    </xsl:template>-->
-    
-    <xsl:template match="tei:lb[not(@break)]">
-        <xsl:text> </xsl:text>
-    </xsl:template>
-    
-    <!--<xsl:template match="tei:add/text()">
-        <xsl:value-of select="normalize-space()"/>
-    </xsl:template>-->
-    
-    <!--<xsl:template match="tei:del">
-        <del><xsl:apply-templates/></del>
-    </xsl:template>-->
-    
-    <xsl:template match="tei:metamark"/>
-    
-    <xsl:template match="tei:note"/>
-    
-    <xsl:template match="tei:seg[not(parent::tei:s)]"/>
-    
-    <xsl:template match="tei:gap[not(parent::tei:s)]"></xsl:template>
-    
-    <!-- match the TEI <del> element -->
     <xsl:template match="tei:del">
         <xsl:choose>
             <!-- if <del> has the @rend attribute, put it in a span tag, display any text/process any nodes contained within -->
@@ -124,6 +80,9 @@
             </xsl:when>
             <xsl:when test="@rend='erased'">
                 <span class="erased"><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text></span>
+            </xsl:when>
+            <xsl:when test="@rend='crossedOut'">
+                <del style="color:black;"><xsl:apply-templates/></del>
             </xsl:when>
             <!-- if it has a @type attribute just process the children -->
             <!-- NOTE: these documents do not have any <del> with both @rend and @status -->
@@ -138,6 +97,13 @@
         </xsl:choose>
     </xsl:template>
     
+    <!-- match the TEI <add> element -->
+    <xsl:template match="tei:add[parent::tei:zone]"/>
+    
+    <xsl:template match="tei:add[parent::tei:s]">
+        <sup><xsl:apply-templates select="@* | node() | text()"/></sup>
+    </xsl:template>
+    
     <!-- find each TEI <gap/> element -->
     <xsl:template match="tei:gap">
         <!-- create a variable whose value is the value of @extent (this should always be an integer) -->
@@ -146,43 +112,28 @@
         <span class="gap"><xsl:for-each select="1 to $missingChars"><xsl:text>x</xsl:text></xsl:for-each></span>
     </xsl:template>
     
-    <!-- match the TEI <subst> element, put it in an HTML <span> tag, match all attributes (specified below), process all nodes, and display all text -->
-    <xsl:template match="tei:subst">
-        <span><xsl:apply-templates select="@* | node() | text()"></xsl:apply-templates></span>
+    <!-- match all TEI <metamark> elements -->
+    <xsl:template match="tei:metamark">
+        <xsl:choose>
+            <!-- if it has a value of "insert" on @function, display a carrot within the HTML <i> element with a @class of "insert" -->
+            <xsl:when test="@function='insert'"><i class="add">^</i></xsl:when>
+            <xsl:when test="@function='transpose'"><span class="transpose-mark"><xsl:apply-templates/></span></xsl:when>
+            <xsl:when test="@rend='upconnect'"><span class="upconnect"><xsl:apply-templates/></span></xsl:when>
+            <xsl:when test="@rend='updownconnect'"><span class="updownconnect"><xsl:apply-templates/></span></xsl:when>
+            <xsl:when test="@rend='downconnect'"><span class="downconnect"><xsl:apply-templates/></span></xsl:when>
+            <xsl:otherwise><xsl:apply-templates/></xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     
-    <!-- match the TEI <add> element -->
-    <xsl:template match="tei:add">
-        <xsl:if test="@place='inline'">
-            <!-- find all the TEI <add> elements with @place="inline" -->
-            <sup><xsl:apply-templates select="@* | node() | text()"/></sup>
-        </xsl:if>
-        <!-- if @place on <add> is "supralinear", stick it in an HTML <sup> tag -->
-        <xsl:if test="@place='supralinear'">
-            <sup><xsl:apply-templates select="@* | node() | text()"/></sup>
-        </xsl:if>
-        <!-- if @place on <add> is "infralinear", stick it in an HTML <sub> tag -->
-        <xsl:if test="@place='infralinear'">
-            <sub><xsl:apply-templates select="@* | node() | text()"/></sub>
-        </xsl:if>
-        <!-- if @place is margintop, -bottom, -left, or -right, stick it in an HTML <span> tag with a @class whose value is whatever the value of @place is -->
-        <xsl:if test="@place='margintop'">
-            <span><xsl:apply-templates select="@* | node() | text()"/></span>
-        </xsl:if>
-        <xsl:if test="@place='marginbottom'">
-            <span><xsl:apply-templates select="@* | node() | text()"/></span>
-        </xsl:if>
-        <xsl:if test="@place='marginleft'">
-            <span><xsl:apply-templates select="@* | node() | text()"/></span>
-        </xsl:if>
-        <xsl:if test="@place='marginright'">
-            <span><xsl:apply-templates select="@* | node() | text()"/></span>
-        </xsl:if>
+    <xsl:template match="tei:seg[not(parent::tei:s)]"/>
+    
+    <xsl:template match="tei:seg[parent::tei:s]">
+        <span class="transpose"><xsl:apply-templates/></span>
     </xsl:template>
     
-    <xsl:template match="tei:seg"><xsl:apply-templates/></xsl:template>
+    <xsl:template match="tei:hi[not(ancestor-or-self::tei:s)]"/>
     
-    <xsl:template match="tei:hi">
+    <xsl:template match="tei:hi[ancestor-or-self::tei:s]">
         <xsl:choose>
             <xsl:when test="@rend='circled'">
                 <span class="circled"><xsl:apply-templates/></span>
@@ -224,33 +175,10 @@
         </xsl:choose>
     </xsl:template>
     
-    <xsl:template match="@place">
-        <xsl:choose>
-            <xsl:when test=".='marginleft'">
-                <xsl:attribute name="class">marginleft</xsl:attribute>
-            </xsl:when>
-            <xsl:when test=".='marginleft'">
-                <xsl:attribute name="class">marginleft</xsl:attribute>
-            </xsl:when>
-            <xsl:when test=".='marginright'">
-                <xsl:attribute name="class">marginright</xsl:attribute>
-            </xsl:when>
-            <xsl:when test=".='margintop'">
-                <xsl:attribute name="class">margintop</xsl:attribute>
-            </xsl:when>
-            <xsl:when test=".='marginbottom'">
-                <xsl:attribute name="class">marginbottom</xsl:attribute>
-            </xsl:when>
-            <xsl:when test=".='infralinear'"/>
-            <xsl:when test=".='supralinear'"/>
-            <xsl:when test=".='inline'"/>
-        </xsl:choose>
-    </xsl:template>
-    
     <!-- @status and @instant should not match onto anything -->
     <xsl:template match="@status"/>
     <xsl:template match="@instant"/>
-    
+    <xsl:template match="@place"/>
     <xsl:template match="@rendition"/>
     
     

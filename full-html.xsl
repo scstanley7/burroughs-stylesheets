@@ -4,19 +4,18 @@
     exclude-result-prefixes="#all"
     version="2.0" xmlns:tei="http://www.tei-c.org/ns/1.0">
     
-    <!-- variables used to create names for new documents -->
-    <xsl:variable name="fileName" select="//tei:sourceDoc/@xml:id"/>
-    <xsl:variable name="docName" select="/tei:TEI/tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"/>
-    
     <!-- suppress TEI header -->
     <xsl:template match="tei:teiHeader"/>
     
     <!-- create a new HTML document for each witness -->
     <!-- @exclude-result-prefixes will ensure that you don't end up with a tei namespace declared on every element -->
     <xsl:template match="tei:surfaceGrp">
+        <xsl:variable name="fileName" select="//tei:sourceDoc/@xml:id"></xsl:variable>
         <xsl:result-document exclude-result-prefixes="#all" indent="yes" method="html" omit-xml-declaration="no" href="{$fileName}.html">
             <html>
-                <head></head>
+                <head>
+                    <link type="text/css" rel="stylesheet" href="bladerunner.css"/>
+                </head>
                 <body><xsl:apply-templates/></body>
             </html>
         </xsl:result-document>
@@ -66,13 +65,7 @@
     <xsl:template match="tei:fw">
         <span>
             <xsl:attribute name="class">pageNum</xsl:attribute>
-            <xsl:attribute name="style">
-                <xsl:choose>
-                    <xsl:when test="@place='top-left'">align:left;</xsl:when>
-                    <xsl:when test="@place='top-right'">align:right;</xsl:when>
-                    <xsl:otherwise>align:center;</xsl:otherwise>
-                </xsl:choose>
-            </xsl:attribute>
+            <xsl:apply-templates/>
         </span>
     </xsl:template>
     
@@ -89,6 +82,11 @@
         </xsl:choose>
     </xsl:template>
     
+    <!-- match the TEI <subst> element, put it in an HTML <span> tag, match all attributes (specified below), process all nodes, and display all text -->
+    <xsl:template match="tei:subst">
+        <span><xsl:apply-templates select="@* | node() | text()"></xsl:apply-templates></span>
+    </xsl:template>
+    
     <!-- match the TEI <del> element -->
     <xsl:template match="tei:del">
         <xsl:choose>
@@ -103,6 +101,9 @@
             <xsl:when test="@rend='erased'">
                 <span class="erased"><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text></span>
             </xsl:when>
+            <xsl:when test="@rend='crossedOut'">
+                <del style="color:black;"><xsl:apply-templates/></del>
+            </xsl:when>
             <!-- if it has a @type attribute just process the children -->
             <!-- NOTE: these documents do not have any <del> with both @rend and @status -->
             <!-- this particular <xsl:choose> would not work if there were <del> elements with both of these attributes -->
@@ -114,19 +115,6 @@
                 <del style="color:black;"><xsl:apply-templates/></del>
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:template>
-    
-    <!-- find each TEI <gap/> element -->
-    <xsl:template match="tei:gap">
-        <!-- create a variable whose value is the value of @extent (this should always be an integer) -->
-        <xsl:variable name="missingChars" select="@extent"/>
-        <!-- for the length of $missingChars (@extent) put an "x" character (e.g. if the `extent="3"` print "xxx"; if `extent="5"` print "xxxxx" -->
-        <span class="gap"><xsl:for-each select="1 to $missingChars"><xsl:text>x</xsl:text></xsl:for-each></span>
-    </xsl:template>
-    
-    <!-- match the TEI <subst> element, put it in an HTML <span> tag, match all attributes (specified below), process all nodes, and display all text -->
-    <xsl:template match="tei:subst">
-        <span><xsl:apply-templates select="@* | node() | text()"></xsl:apply-templates></span>
     </xsl:template>
     
     <!-- match the TEI <add> element -->
@@ -169,12 +157,20 @@
         </xsl:if>
     </xsl:template>
     
+    <!-- find each TEI <gap/> element -->
+    <xsl:template match="tei:gap">
+        <!-- create a variable whose value is the value of @extent (this should always be an integer) -->
+        <xsl:variable name="missingChars" select="@extent"/>
+        <!-- for the length of $missingChars (@extent) put an "x" character (e.g. if the `extent="3"` print "xxx"; if `extent="5"` print "xxxxx" -->
+        <span class="gap"><xsl:for-each select="1 to $missingChars"><xsl:text>x</xsl:text></xsl:for-each></span>
+    </xsl:template>
+    
     <!-- match all TEI <metamark> elements -->
     <xsl:template match="tei:metamark">
         <xsl:choose>
-            <!--             if it has a value of "insert" on @function, display a carrot within the HTML <i> element with a @class of "insert" -->
+            <!-- if it has a value of "insert" on @function, display a carrot within the HTML <i> element with a @class of "insert" -->
             <xsl:when test="@function='insert'"><i class="add">^</i></xsl:when>
-            <!-- TBD, although I suspect this will involve inline CSS, unfortunately --> 
+            <xsl:when test="@function='transpose'"><span class="transpose-mark"><xsl:apply-templates/></span></xsl:when>
             <xsl:when test="@rend='upconnect'"><span class="upconnect"><xsl:apply-templates/></span></xsl:when>
             <xsl:when test="@rend='updownconnect'"><span class="updownconnect"><xsl:apply-templates/></span></xsl:when>
             <xsl:when test="@rend='downconnect'"><span class="downconnect"><xsl:apply-templates/></span></xsl:when>
@@ -182,8 +178,10 @@
         </xsl:choose>
     </xsl:template>
     
-    <xsl:template match="tei:seg"><xsl:apply-templates/></xsl:template>
-    
+    <xsl:template match="tei:seg">
+        <span class="transpose"><xsl:apply-templates/></span>
+    </xsl:template>
+
     <xsl:template match="tei:hi">
         <xsl:choose>
             <xsl:when test="@rend='circled'">
@@ -199,6 +197,17 @@
                 <xsl:apply-templates/>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+    
+    <xsl:template match="tei:delSpan">
+        <xsl:variable name="delspan_id">
+            <xsl:analyze-string select="@spanTo" regex="#(delspants\d_\d)">
+                <xsl:matching-substring><xsl:value-of select="regex-group(1)"/></xsl:matching-substring>
+            </xsl:analyze-string>
+        </xsl:variable>
+        <a>
+            <xsl:attribute name="id"><xsl:value-of select="$delspan_id"/></xsl:attribute>
+        </a>
     </xsl:template>
     
     <!-- ******************************************************* -->
@@ -252,7 +261,6 @@
     <!-- @status and @instant should not match onto anything -->
     <xsl:template match="@status"/>
     <xsl:template match="@instant"/>
-    
     <xsl:template match="@rendition"/>
     
 </xsl:stylesheet>

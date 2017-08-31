@@ -1,5 +1,7 @@
 # Burroughs Project Stylesheets
 
+*This is a test change for the GitHub workshop*
+
 These stylesheets are used to transform the Burroughs TEI documents into the various components necessary for generating Islandora ingest packages for the [Comparative Edition Solution Pack](https://github.com/fsulib/islandora_solution_pack_comparative_edition). 
 
 * [display.xsl](https://github.com/scstanley7/burroughs-stylesheets/blob/master/display.xsl) is used to generate the page HTML files that display the transcriptions

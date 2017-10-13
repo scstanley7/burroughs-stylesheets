@@ -11,4 +11,3 @@ These stylesheets are used to transform the Burroughs TEI documents into the var
 * [index-tags.xsl](https://github.com/scstanley7/burroughs-stylesheets/blob/master/index-tags.xsl) creates a sentence list for each page like the one created by index-plain.xsl, but it outputs the sentences surrounded with an <span> tag with HTML for display.
 * [pseudo-TEI.xsl](https://github.com/scstanley7/burroughs-stylesheets/blob/master/pseudo-TEI.xsl) creates page-level TEI-like files that replicate all of the contents of <surface> for each page.
 
-* test change for workshop

@@ -5,10 +5,17 @@
     version="2.0" xmlns:tei="http://www.tei-c.org/ns/1.0">
     <xsl:variable name="fileName" select="//tei:sourceDoc/@xml:id"/>
     
+    <xsl:strip-space elements="tei:surface tei:s tei:lb"/>
+    
+    
+    
+    
+    
+    
+    
     <xsl:template match="tei:teiHeader"/>
     
     <xsl:template match="tei:fw"/>
-    <xsl:strip-space elements="tei:surface tei:s tei:lb"/>
     
     <xsl:template match="tei:surface">
         <xsl:variable name="fileName-generated" select="@facs"/>
@@ -20,12 +27,13 @@
     <xsl:template match="tei:zone[not(child::tei:s)]"/>
     
     <xsl:template match="tei:zone/text()">
-<xsl:text>
+        <xsl:text>
 </xsl:text>
     </xsl:template>
     
     
-    <xsl:template match="//tei:s">
+    
+    <xsl:template match="tei:s">
         <xsl:variable name="sentenceNum">
             <xsl:analyze-string select="@n" regex="(\d+?)\.\d.\d">
                 <xsl:matching-substring><xsl:value-of select="regex-group(1)"/></xsl:matching-substring>
@@ -48,6 +56,13 @@
             <xsl:matching-substring><xsl:text> </xsl:text></xsl:matching-substring>
             <xsl:non-matching-substring><xsl:value-of select="."/></xsl:non-matching-substring>
         </xsl:analyze-string>
+    </xsl:template>
+    
+    <xsl:template match="tei:metamark"/>
+    
+    <xsl:template match="tei:hi">
+        <xsl:if test="ancestor::tei:s"><xsl:apply-templates/></xsl:if>
+        <xsl:if test="not(ancestor::tei:s)"/>        
     </xsl:template>
     
     <xsl:template match="tei:del"/>

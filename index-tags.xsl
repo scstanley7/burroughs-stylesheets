@@ -68,7 +68,7 @@
         <span><xsl:apply-templates select="@* | node() | text()"></xsl:apply-templates></span>
     </xsl:template>
     
-    <xsl:template match="tei:del">
+    <xsl:template match="tei:del[ancestor::tei:s]">
         <xsl:choose>
             <!-- if <del> has the @rend attribute, put it in a span tag, display any text/process any nodes contained within -->
             <!-- also, match any attributes **see section below for more information on how attributes match** -->
@@ -97,6 +97,8 @@
         </xsl:choose>
     </xsl:template>
     
+    <xsl:template match="tei:del[not(ancestor::tei:s)]"/>
+    
     <!-- match the TEI <add> element -->
     <xsl:template match="tei:add[parent::tei:zone]"/>
     
@@ -113,7 +115,7 @@
     </xsl:template>
     
     <!-- match all TEI <metamark> elements -->
-    <xsl:template match="tei:metamark">
+    <xsl:template match="tei:metamark[ancestor::tei:s]">
         <xsl:choose>
             <!-- if it has a value of "insert" on @function, display a carrot within the HTML <i> element with a @class of "insert" -->
             <xsl:when test="@function='insert'"><i class="add">^</i></xsl:when>
@@ -124,6 +126,8 @@
             <xsl:otherwise><xsl:apply-templates/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+    
+    <xsl:template match="tei:metamark[not(ancestor::tei:s)]"/>
     
     <xsl:template match="tei:seg[not(parent::tei:s)]"/>
     
